@@ -2,6 +2,10 @@ package models
 
 // Game represents a game in the application.
 type Game struct {
-	GameUUID  string `json:"game_uuid"`
-	ServiceID int    `json:"service_id"`
+	UUID           string `json:"uuid"`
+	ServiceName    string `json:"service_name"`
+	ServerIP       string `json:"server_ip"`
+	PlayerQuantity int    `json:"player_quantity"`
+	GameState      string `json:"game_state"`
+	StateTime      string `json:"state_time"`
 }

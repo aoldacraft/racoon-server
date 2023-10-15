@@ -8,10 +8,11 @@ import (
 	"net/http"
 )
 
+// GetAllGames fetches all games from the database.
 func GetAllGames(db *sql.DB) func(c echo.Context) error {
 	return func(c echo.Context) error {
 		// Query to select all games
-		query := "SELECT game_uuid, service_id FROM game"
+		query := "SELECT uuid, service_name, server_ip, player_quantity, game_state, state_time FROM game"
 
 		rows, err := db.Query(query)
 		if err != nil {
@@ -26,7 +27,7 @@ func GetAllGames(db *sql.DB) func(c echo.Context) error {
 		// Iterate through the rows and scan the results
 		for rows.Next() {
 			game := models.Game{}
-			err := rows.Scan(&game.GameUUID, &game.ServiceID)
+			err := rows.Scan(&game.UUID, &game.ServiceName, &game.ServerIP, &game.PlayerQuantity, &game.GameState, &game.StateTime)
 			if err != nil {
 				log.Println(err)
 				return c.JSON(http.StatusInternalServerError, "Failed to fetch games")
@@ -45,18 +46,19 @@ func GetAllGames(db *sql.DB) func(c echo.Context) error {
 	}
 }
 
+// GetGame fetches a game by its UUID from the database.
 func GetGame(db *sql.DB) func(c echo.Context) error {
 	return func(c echo.Context) error {
-		// Get the game_uuid from the URL parameter
-		gameUUID := c.Param("game_uuid")
+		// Get the game UUID from the URL parameter
+		gameUUID := c.Param("uuid")
 
-		// Query to select the game by game_uuid
-		query := "SELECT game_uuid, service_id FROM game WHERE game_uuid = $1"
+		// Query to select the game by game UUID
+		query := "SELECT uuid, service_name, server_ip, player_quantity, game_state, state_time FROM game WHERE uuid = $1"
 
 		row := db.QueryRow(query, gameUUID)
 
 		game := models.Game{}
-		err := row.Scan(&game.GameUUID, &game.ServiceID)
+		err := row.Scan(&game.UUID, &game.ServiceName, &game.ServerIP, &game.PlayerQuantity, &game.GameState, &game.StateTime)
 		if err != nil {
 			if err == sql.ErrNoRows {
 				return c.JSON(http.StatusNotFound, "Game not found")
@@ -71,6 +73,7 @@ func GetGame(db *sql.DB) func(c echo.Context) error {
 	}
 }
 
+// CreateGame creates a new game in the database.
 func CreateGame(db *sql.DB) func(c echo.Context) error {
 	return func(c echo.Context) error {
 		// Parse the request body to extract the game data
@@ -80,8 +83,8 @@ func CreateGame(db *sql.DB) func(c echo.Context) error {
 		}
 
 		// Insert the new game into the database
-		insertSQL := "INSERT INTO game (game_uuid, service_id) VALUES ($1, $2)"
-		_, err := db.Exec(insertSQL, game.GameUUID, game.ServiceID)
+		insertSQL := "INSERT INTO game (uuid, service_name, server_ip, player_quantity, game_state, state_time) VALUES ($1, $2, $3, $4, $5, $6)"
+		_, err := db.Exec(insertSQL, game.UUID, game.ServiceName, game.ServerIP, game.PlayerQuantity, game.GameState, game.StateTime)
 		if err != nil {
 			log.Println(err)
 			return c.JSON(http.StatusInternalServerError, "Failed to create the game")

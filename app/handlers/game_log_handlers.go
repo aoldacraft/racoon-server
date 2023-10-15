@@ -10,11 +10,11 @@ import (
 
 func GetGameLog(db *sql.DB) func(c echo.Context) error {
 	return func(c echo.Context) error {
-		// Get the game_uuid from the URL parameter
-		gameUUID := c.Param("game_uuid")
+		// Get the game UUID from the URL parameter
+		gameUUID := c.Param("uuid")
 
-		// Query to select all logs for the specified game_uuid
-		query := "SELECT log_id, game_uuid, log_text FROM game_log WHERE game_uuid = $1"
+		// Query to select all logs for the specified game UUID, including service_name
+		query := "SELECT log_id, service_name, uuid, log_text, log_time FROM game_log WHERE uuid = $1"
 
 		rows, err := db.Query(query, gameUUID)
 		if err != nil {
@@ -29,7 +29,7 @@ func GetGameLog(db *sql.DB) func(c echo.Context) error {
 		// Iterate through the rows and scan the results
 		for rows.Next() {
 			logEntry := models.GameLog{}
-			err := rows.Scan(&logEntry.LogID, &logEntry.GameUUID, &logEntry.LogText)
+			err := rows.Scan(&logEntry.LogID, &logEntry.ServiceName, &logEntry.UUID, &logEntry.LogText, &logEntry.LogTime)
 			if err != nil {
 				log.Println(err)
 				return c.JSON(http.StatusInternalServerError, "Failed to fetch game logs")
@@ -50,22 +50,27 @@ func GetGameLog(db *sql.DB) func(c echo.Context) error {
 
 func CreateGameLog(db *sql.DB) func(c echo.Context) error {
 	return func(c echo.Context) error {
-		// Get the game_uuid from the URL parameter
-		gameUUID := c.Param("game_uuid")
+		// Get the game UUID from the URL parameter
+		gameUUID := c.Param("uuid")
 
 		// Parse the request body to extract the log text
-		type LogRequest struct {
-			LogText string `json:"log_text"`
-		}
-
-		logRequest := new(LogRequest)
+		logRequest := new(models.GameLog)
 		if err := c.Bind(logRequest); err != nil {
 			return c.JSON(http.StatusBadRequest, "Invalid request body")
 		}
 
-		// Insert the new game log into the database
-		insertSQL := "INSERT INTO game_log (game_uuid, log_text) VALUES ($1, $2)"
-		_, err := db.Exec(insertSQL, gameUUID, logRequest.LogText)
+		// Get the game's service name from the database
+		queryServiceName := "SELECT service_name FROM game WHERE uuid = $1"
+		var serviceName string
+		err := db.QueryRow(queryServiceName, gameUUID).Scan(&serviceName)
+		if err != nil {
+			log.Println(err)
+			return c.JSON(http.StatusInternalServerError, "Failed to get service name")
+		}
+
+		// Insert the new game log into the database with the service name
+		insertSQL := "INSERT INTO game_log (uuid, service_name, log_text, log_time) VALUES ($1, $2, $3, now())"
+		_, err = db.Exec(insertSQL, gameUUID, serviceName, logRequest.LogText)
 		if err != nil {
 			log.Println(err)
 			return c.JSON(http.StatusInternalServerError, "Failed to create the game log")

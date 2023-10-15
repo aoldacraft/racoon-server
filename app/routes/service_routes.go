@@ -14,6 +14,6 @@ func RegisterServiceRoutes(e *echo.Echo, db *sql.DB) {
 	serviceGroup.GET("/:service_name", handlers.GetService(db))
 	serviceGroup.GET("/:service_name/game", handlers.GetServiceGame(db))
 	serviceGroup.POST("", handlers.CreateService(db))
-	serviceGroup.PUT("/:id", handlers.UpdateService(db))
-	serviceGroup.DELETE("/:id", handlers.DeleteService(db))
+	serviceGroup.PUT("/:service_name", handlers.UpdateService(db))
+	serviceGroup.DELETE("/:service_name", handlers.DeleteService(db))
 }

@@ -6,6 +6,8 @@ import (
 	"go_racoon/models"
 	"log"
 	"net/http"
+	"strconv"
+	"strings"
 )
 
 // GetAllGames fetches all games from the database.
@@ -91,5 +93,58 @@ func CreateGame(db *sql.DB) func(c echo.Context) error {
 		}
 
 		return c.JSON(http.StatusCreated, "Game created successfully")
+	}
+}
+
+// UpdateGame updates a game in the database.
+func UpdateGame(db *sql.DB) func(c echo.Context) error {
+	return func(c echo.Context) error {
+		// Get the game UUID from the URL parameter
+		gameUUID := c.Param("uuid")
+
+		// Parse the request body to extract the updated game data
+		game := new(models.Game)
+		if err := c.Bind(game); err != nil {
+			return c.JSON(http.StatusBadRequest, "Invalid request body")
+		}
+
+		// Construct the dynamic SQL query
+		updateSQL := "UPDATE game SET "
+		args := []interface{}{}
+		argCount := 1
+
+		// Check each field for updates and add it to the query
+		if game.ServerIP != "" {
+			updateSQL += "server_ip = $" + strconv.Itoa(argCount) + ", "
+			args = append(args, game.ServerIP)
+			argCount++
+		}
+		if game.PlayerQuantity > 0 {
+			updateSQL += "player_quantity = $" + strconv.Itoa(argCount) + ", "
+			args = append(args, game.PlayerQuantity)
+			argCount++
+		}
+		if game.GameState != "" {
+			updateSQL += "game_state = $" + strconv.Itoa(argCount) + ", "
+			args = append(args, game.GameState)
+			argCount++
+		}
+		if game.StateTime != "" {
+			updateSQL += "state_time = $" + strconv.Itoa(argCount) + ", "
+			args = append(args, game.StateTime)
+		}
+
+		// Remove the trailing comma and add the WHERE clause
+		updateSQL = strings.TrimSuffix(updateSQL, ", ") + " WHERE uuid = $" + strconv.Itoa(argCount)
+		args = append(args, gameUUID)
+
+		// Execute the dynamic SQL query
+		_, err := db.Exec(updateSQL, args...)
+		if err != nil {
+			log.Println(err)
+			return c.JSON(http.StatusInternalServerError, "Failed to update the game")
+		}
+
+		return c.JSON(http.StatusOK, "Game updated successfully")
 	}
 }

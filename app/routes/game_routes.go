@@ -12,4 +12,5 @@ func RegisterGameRoutes(e *echo.Echo, db *sql.DB) {
 	gameGroup.GET("", handlers.GetAllGames(db))
 	gameGroup.GET("/:uuid", handlers.GetGame(db))
 	gameGroup.POST("", handlers.CreateGame(db))
+	gameGroup.POST("/:uuid", handlers.UpdateGame(db))
 }

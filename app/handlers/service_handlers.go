@@ -16,7 +16,7 @@ func GetAllServices(db *sql.DB) func(c echo.Context) error {
 		rows, err := db.Query(query)
 		if err != nil {
 			log.Println(err)
-			return c.JSON(http.StatusInternalServerError, "Failed to retrieve services")
+			return c.JSON(http.StatusInternalServerError, "Failed to retrieve services1")
 		}
 		defer rows.Close()
 
@@ -27,7 +27,7 @@ func GetAllServices(db *sql.DB) func(c echo.Context) error {
 			var service models.Service
 			if err := rows.Scan(&service.ServiceName, &service.ServerQuantity, &service.TotalPlayer); err != nil {
 				log.Println(err)
-				return c.JSON(http.StatusInternalServerError, "Failed to retrieve services")
+				return c.JSON(http.StatusInternalServerError, "Failed to retrieve services2")
 			}
 			services = append(services, service)
 		}

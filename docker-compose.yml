@@ -2,12 +2,11 @@ version: '3'
 
 services:
 
-  # PostgreSQL 데이터베이스 컨테이너
   rc_db:
-    image: postgres:13  # 사용할 PostgreSQL 이미지 버전
+    image: postgres:13
     environment:
       POSTGRES_USER: racoondb
       POSTGRES_PASSWORD: racoondb
       POSTGRES_DB: racoondb
     ports:
-      - "5432:5432"  # 호스트의 포트와 컨테이너의 포트를 연결
+      - "5432:5432"

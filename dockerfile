@@ -2,6 +2,9 @@ FROM golang:alpine
 
 WORKDIR /app
 
+# 필요한 패키지 설치
+RUN apk update && apk add git
+
 # Copy the source code
 COPY . .
 
@@ -17,6 +20,9 @@ ENV DB_PORT 5432
 ENV DB_USER racoondb
 ENV DB_PASSWORD racoondb
 ENV DB_NAME racoondb
+
+# 필요한 패키지 삭제
+RUN apk del git
 
 # Run the executable
 CMD ["./app"]

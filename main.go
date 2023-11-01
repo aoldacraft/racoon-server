@@ -6,9 +6,10 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	_ "github.com/lib/pq"
-	"go_racoon/app/handlers"
-	"go_racoon/app/routes"
+	"log"
 	"os"
+	"rc_app/app/handlers"
+	"rc_app/app/routes"
 )
 
 func main() {
@@ -18,7 +19,12 @@ func main() {
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
-	// Database connection
+	//// Database connection
+	//db, err := sql.Open("postgres", "user=racoondb password=racoondb dbname=racoondb sslmode=disable")
+	//if err != nil {
+	//	fmt.Println(err)
+	//}
+
 	// 환경 변수에서 데이터베이스 연결 정보 가져오기
 	dbHost := os.Getenv("DB_HOST")
 	dbPort := os.Getenv("DB_PORT")
@@ -28,6 +34,7 @@ func main() {
 
 	// PostgreSQL 연결 문자열 생성
 	connectionString := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", dbHost, dbPort, dbUser, dbPassword, dbName)
+	log.Println(connectionString)
 
 	// 데이터베이스에 연결
 	db, err := sql.Open("postgres", connectionString)

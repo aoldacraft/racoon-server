@@ -3,9 +3,9 @@ package handlers
 import (
 	"database/sql"
 	"github.com/labstack/echo/v4"
-	"go_racoon/models"
 	"log"
 	"net/http"
+	"rc_app/models"
 )
 
 // GetAllServices returns all services from the database.

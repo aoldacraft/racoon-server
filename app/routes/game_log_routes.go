@@ -3,7 +3,7 @@ package routes
 import (
 	"database/sql"
 	"github.com/labstack/echo/v4"
-	"go_racoon/app/handlers"
+	"rc_app/app/handlers"
 )
 
 func RegisterGameLogRoutes(e *echo.Echo, db *sql.DB) {

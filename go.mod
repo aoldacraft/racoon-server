@@ -1,4 +1,4 @@
-module go_racoon
+module rc_app
 
 go 1.20
 

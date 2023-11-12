@@ -27,12 +27,6 @@ WORKDIR /
 
 COPY --from=build-stage /rc_server /rc_server
 
-ENV DB_HOST 10.16.18.144
-ENV DB_PORT 5432
-ENV DB_USER racoondb
-ENV DB_PASSWORD racoondb
-ENV DB_NAME racoondb
-
 EXPOSE 1323
 
 ENTRYPOINT ["/rc_server"]

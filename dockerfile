@@ -30,3 +30,4 @@ COPY --from=build-stage /rc_server /rc_server
 EXPOSE 1323
 
 ENTRYPOINT ["/rc_server"]
+

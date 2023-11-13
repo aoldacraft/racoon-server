@@ -1,5 +1,5 @@
 # Build the application from source
-FROM golang:alpine AS build-stage
+FROM docker.io/library/golang:alpine AS build-stage
 
 ENV GO111MODULE=on \
     CGO_ENABLED=0 \

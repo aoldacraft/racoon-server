@@ -18,6 +18,10 @@ func main() {
 	// Middleware
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
+	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins: []string{"http://localhost:3000"}, // 원하는 도메인으로 변경
+		AllowMethods: []string{echo.GET, echo.HEAD, echo.PUT, echo.PATCH, echo.POST, echo.DELETE},
+	}))
 
 	//// Database connection
 	//db, err := sql.Open("postgres", "user=racoondb password=racoondb dbname=racoondb sslmode=disable")
